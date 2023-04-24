@@ -6,7 +6,7 @@
 create database test17_trigger;
 use test17_trigger;
 
-create table emps as select employee_id,last_name,salary from atguigudb.`employees`;
+create table emps as select employee_id,last_name,salary from atguigudb.employees;
 select * from emps;
 
 # 1. 复制一张 emps 表的空表 emps_back，只有表结构，不包含任何数据

@@ -25,15 +25,15 @@ explain select * from ts1 order by a desc,b desc limit 5;            -- 不推�
 
 -- 2. 隐藏索引
 -- ① 创建表时，隐藏索引
-create table `book7`
+create table book7
 (
-    `book_id`          int,
-    `book_name`        varchar(100),
-    `authors`          varchar(100),
-    `info`             varchar(100),
-    `comment`          varchar(100),
-    `year_publication` year,
-    index `idx_cmt` (`comment`) invisible                            -- 创建不可见的索引
+    book_id          int,
+    book_name        varchar(100),
+    authors          varchar(100),
+    info             varchar(100),
+    comment          varchar(100),
+    year_publication year,
+    index idx_cmt (comment) invisible                            -- 创建不可见的索引
 );
 
 show index from book7;

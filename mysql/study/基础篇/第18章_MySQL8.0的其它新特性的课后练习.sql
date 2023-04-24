@@ -5,11 +5,11 @@
 create database test18_mysql8;
 use test18_mysql8;
 
-create table `students`
+create table students
 (
-    `id`      int primary key auto_increment,
-    `student` varchar(15),
-    `points`  tinyint
+    id      int primary key auto_increment,
+    student varchar(15),
+    points  tinyint
 );
 
 #2. 向表中添加数据如下

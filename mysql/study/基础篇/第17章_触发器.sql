@@ -6,16 +6,16 @@ use dbtest17;
 
 # 1. 创建触发器
 # 举例1：
-create table `test_trigger`                                          # ① 创建数据表
+create table test_trigger                                          # ① 创建数据表
 (
-    `id`     int primary key auto_increment,
-    `t_note` varchar(30)
+    id     int primary key auto_increment,
+    t_note varchar(30)
 );
 
-create table `test_trigger_log`
+create table test_trigger_log
 (
-    `id`    int primary key auto_increment,
-    `t_log` varchar(30)
+    id    int primary key auto_increment,
+    t_log varchar(30)
 );
 
 select * from test_trigger;                                          # ② 查看表数据
@@ -62,8 +62,8 @@ select * from test_trigger_log;
 # 则报 sqlstate_value 为 'hy000' 的错误，从而使得添加失败。
 
 # 准备工作
-create table employees as select * from atguigudb.`employees`;
-create table departments as select * from atguigudb.`departments`;
+create table employees as select * from atguigudb.employees;
+create table departments as select * from atguigudb.departments;
 
 desc employees;
 
