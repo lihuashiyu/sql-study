@@ -16,14 +16,15 @@ create table if not exists row_no
     salary int        not null     comment '工资'
 );
 
-insert ignore into row_no (id, user, name, age, salary) values (101, 'u1', 'a1', 10, 8000);
-insert ignore into row_no (id, user, name, age, salary) values (102, 'u1', 'a2', 11, 7500);
-insert ignore into row_no (id, user, name, age, salary) values (103, 'u2', 'b1', 12, 7500);
-insert ignore into row_no (id, user, name, age, salary) values (104, 'u2', 'b2', 13, 4500);
-insert ignore into row_no (id, user, name, age, salary) values (105, 'u3', 'c1', 14, 8000);
-insert ignore into row_no (id, user, name, age, salary) values (106, 'u3', 'c2', 15, 20000);
-insert ignore into row_no (id, user, name, age, salary) values (107, 'u4', 'd1', 16, 30000);
-insert ignore into row_no (id, user, name, age, salary) values (108, 'u5', 'd2', 17, 8000);
+insert ignore into row_no (id, user, name, age, salary)
+values (101, 'u1', 'a1', 10, 8000),
+       (102, 'u1', 'a2', 11, 7500),
+       (103, 'u2', 'b1', 12, 7500),
+       (104, 'u2', 'b2', 13, 4500),
+       (105, 'u3', 'c1', 14, 8000),
+       (106, 'u3', 'c2', 15, 20000),
+       (107, 'u4', 'd1', 16, 30000),
+       (108, 'u5', 'd2', 17, 8000);
 
 -- rank()
 select *, rank() over(order by salary) as `rank` from row_no;
@@ -81,26 +82,27 @@ create table if not exists user_login_info
     status      int         not null      comment '在线状态：0，离线；1，在线'
 ) engine = InnoDB character set = 'utf8mb4' comment '面试';
 
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (101, 'u01', '2021-10-21', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (102, 'u02', '2021-10-21', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (103, 'u03', '2021-10-21', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (104, 'u04', '2021-10-21', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (105, 'u01', '2021-10-22', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (106, 'u02', '2021-10-22', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (107, 'u03', '2021-10-22', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (108, 'u04', '2021-10-22', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (109, 'u01', '2021-10-23', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (110, 'u02', '2021-10-23', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (111, 'u03', '2021-10-23', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (112, 'u02', '2021-10-24', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (113, 'u03', '2021-10-24', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (114, 'u01', '2021-10-25', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (115, 'u02', '2021-10-25', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (116, 'u03', '2021-10-25', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (117, 'u01', '2021-10-26', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (118, 'u02', '2021-10-26', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (119, 'u04', '2021-10-26', 1);
-insert ignore into user_login_info (`id`, `user_id`, login_date, status) values (120, 'u03', '2021-10-27', 1);
+insert ignore into user_login_info (`id`, `user_id`, login_date, status)
+values (101, 'u01', '2021-10-21', 1),
+       (102, 'u02', '2021-10-21', 1),
+       (103, 'u03', '2021-10-21', 1),
+       (104, 'u04', '2021-10-21', 1),
+       (105, 'u01', '2021-10-22', 1),
+       (106, 'u02', '2021-10-22', 1),
+       (107, 'u03', '2021-10-22', 1),
+       (108, 'u04', '2021-10-22', 1),
+       (109, 'u01', '2021-10-23', 1),
+       (110, 'u02', '2021-10-23', 1),
+       (111, 'u03', '2021-10-23', 1),
+       (112, 'u02', '2021-10-24', 1),
+       (113, 'u03', '2021-10-24', 1),
+       (114, 'u01', '2021-10-25', 1),
+       (115, 'u02', '2021-10-25', 1),
+       (116, 'u03', '2021-10-25', 1),
+       (117, 'u01', '2021-10-26', 1),
+       (118, 'u02', '2021-10-26', 1),
+       (119, 'u04', '2021-10-26', 1),
+       (120, 'u03', '2021-10-27', 1);
 
 -- 统计连续 N 天登录的用户信息 Top3
 select u.user_id,
@@ -121,7 +123,6 @@ from
 ) as u
 group by u.user_id, u.group_id                             -- 按照用户、锚定日期分组
 having day_count >= 3;                                     -- 筛选出至少 3 次的连续登录操作
-
 
 -- 每个用户连续登录的最长天数，间隔一天的两次登录也可以看作连续登录
 select t4.user_id,
@@ -194,29 +195,30 @@ create table if not exists champion
     team   varchar(16)  not null     comment '冠军队伍'
 ) engine = InnoDB character set = 'utf8mb4' comment '冠军表';
 
-insert ignore into champion (year, team) values (2000, 'Sun');
-insert ignore into champion (year, team) values (2001, 'Lakers');
-insert ignore into champion (year, team) values (2002, 'Rockets');
-insert ignore into champion (year, team) values (2003, 'Rockets');
-insert ignore into champion (year, team) values (2004, 'Rockets');
-insert ignore into champion (year, team) values (2005, 'Spurs');
-insert ignore into champion (year, team) values (2006, 'Spurs');
-insert ignore into champion (year, team) values (2007, 'Sun');
-insert ignore into champion (year, team) values (2008, 'Lakers');
-insert ignore into champion (year, team) values (2009, 'Lakers');
-insert ignore into champion (year, team) values (2010, 'Lakers');
-insert ignore into champion (year, team) values (2011, 'Lakers');
-insert ignore into champion (year, team) values (2012, 'Warriors');
-insert ignore into champion (year, team) values (2013, 'Warriors');
-insert ignore into champion (year, team) values (2014, 'Warriors');
-insert ignore into champion (year, team) values (2015, 'Heat');
-insert ignore into champion (year, team) values (2016, 'Warriors');
-insert ignore into champion (year, team) values (2017, 'Cavaliers');
-insert ignore into champion (year, team) values (2018, 'Warriors');
-insert ignore into champion (year, team) values (2019, 'Sun');
-insert ignore into champion (year, team) values (2020, 'Warriors');
-insert ignore into champion (year, team) values (2021, 'Warriors');
-insert ignore into champion (year, team) values (2022, 'Raptors');
+insert ignore into champion (year, team)
+values (2000, 'Sun'),
+       (2001, 'Lakers'),
+       (2002, 'Rockets'),
+       (2003, 'Rockets'),
+       (2004, 'Rockets'),
+       (2005, 'Spurs'),
+       (2006, 'Spurs'),
+       (2007, 'Sun'),
+       (2008, 'Lakers'),
+       (2009, 'Lakers'),
+       (2010, 'Lakers'),
+       (2011, 'Lakers'),
+       (2012, 'Warriors'),
+       (2013, 'Warriors'),
+       (2014, 'Warriors'),
+       (2015, 'Heat'),
+       (2016, 'Warriors'),
+       (2017, 'Cavaliers'),
+       (2018, 'Warriors'),
+       (2019, 'Sun'),
+       (2020, 'Warriors'),
+       (2021, 'Warriors'),
+       (2022, 'Raptors');
 
 -- 连续 3 年获得冠军的队伍
 select u.team,                                             -- 查询队伍在起始年份及其之后的连续获得冠军的次数
@@ -271,24 +273,25 @@ create table if not exists equities_price
     price decimal(3, 0) not null    comment '交易价格'
 ) engine = InnoDB character set = 'utf8mb4' comment '股票交易表';
 
-insert ignore into equities_price (id, stock, time, price) values (101, 'A1', '06:00', 12);
-insert ignore into equities_price (id, stock, time, price) values (102, 'A1', '09:00', 16);
-insert ignore into equities_price (id, stock, time, price) values (103, 'A1', '12:00', 24);
-insert ignore into equities_price (id, stock, time, price) values (104, 'A1', '15:00', 17);
-insert ignore into equities_price (id, stock, time, price) values (105, 'A1', '18:00', 11);
-insert ignore into equities_price (id, stock, time, price) values (106, 'A1', '21:00', 13);
-insert ignore into equities_price (id, stock, time, price) values (107, 'B1', '06:00', 18);
-insert ignore into equities_price (id, stock, time, price) values (108, 'B1', '09:00', 12);
-insert ignore into equities_price (id, stock, time, price) values (109, 'B1', '12:00', 13);
-insert ignore into equities_price (id, stock, time, price) values (110, 'B1', '15:00', 13);
-insert ignore into equities_price (id, stock, time, price) values (111, 'B1', '18:00', 15);
-insert ignore into equities_price (id, stock, time, price) values (112, 'B1', '21:00', 17);
-insert ignore into equities_price (id, stock, time, price) values (113, 'C1', '06:00', 12);
-insert ignore into equities_price (id, stock, time, price) values (114, 'C1', '09:00', 13);
-insert ignore into equities_price (id, stock, time, price) values (115, 'C1', '12:00', 15);
-insert ignore into equities_price (id, stock, time, price) values (116, 'C1', '15:00', 17);
-insert ignore into equities_price (id, stock, time, price) values (117, 'C1', '18:00', 18);
-insert ignore into equities_price (id, stock, time, price) values (118, 'C1', '21:00', 20);
+insert ignore into equities_price (id, stock, time, price)
+values (101, 'A1', '06:00', 12),
+       (102, 'A1', '09:00', 16),
+       (103, 'A1', '12:00', 24),
+       (104, 'A1', '15:00', 17),
+       (105, 'A1', '18:00', 11),
+       (106, 'A1', '21:00', 13),
+       (107, 'B1', '06:00', 18),
+       (108, 'B1', '09:00', 12),
+       (109, 'B1', '12:00', 13),
+       (110, 'B1', '15:00', 13),
+       (111, 'B1', '18:00', 15),
+       (112, 'B1', '21:00', 17),
+       (113, 'C1', '06:00', 12),
+       (114, 'C1', '09:00', 13),
+       (115, 'C1', '12:00', 15),
+       (116, 'C1', '15:00', 17),
+       (117, 'C1', '18:00', 18),
+       (118, 'C1', '21:00', 20);
 
 -- 查询波峰点和波谷
 select v.stock,
@@ -311,7 +314,7 @@ from
                lag(price)  over(partition by stock order by time) as previous, -- 前面时间点的价格
                lead(price) over(partition by stock order by time) as next      -- 后面时间点的价格
         from equities_price
-    ) t where t.price > t.previous and t.price > t.next -- 筛选出波峰点
+    ) t where t.price > t.previous and t.price > t.next                       -- 筛选出波峰点
     union
     select d.stock,                                                     -- 查询波谷点
            d.time,
@@ -327,7 +330,6 @@ from
         from equities_price
     ) as d where d.price < d.previous and d.price < d.next                   -- 筛选出波谷点
 ) as v;
-
 
 
 -- -------------------------------------------------------------------------------------------------
@@ -362,24 +364,25 @@ create table if not exists user_glance_info
     event   int        not null    comment '触发事件：0，点击；1，双击；2，回车'
 ) engine = InnoDB character set = 'utf8mb4' comment '用户浏览信息表';
 
-insert ignore into user_glance_info (id, user_id, time, event) values (101, 'a', 1001, 0);
-insert ignore into user_glance_info (id, user_id, time, event) values (102, 'a', 1005, 0);
-insert ignore into user_glance_info (id, user_id, time, event) values (103, 'a', 1020, 0);
-insert ignore into user_glance_info (id, user_id, time, event) values (104, 'a', 1048, 0);
-insert ignore into user_glance_info (id, user_id, time, event) values (105, 'a', 1078, 0);
-insert ignore into user_glance_info (id, user_id, time, event) values (106, 'a', 1230, 0);
-insert ignore into user_glance_info (id, user_id, time, event) values (107, 'a', 1245, 0);
-insert ignore into user_glance_info (id, user_id, time, event) values (108, 'a', 1270, 0);
-insert ignore into user_glance_info (id, user_id, time, event) values (109, 'a', 1282, 0);
-insert ignore into user_glance_info (id, user_id, time, event) values (110, 'b', 1101, 0);
-insert ignore into user_glance_info (id, user_id, time, event) values (111, 'b', 1132, 0);
-insert ignore into user_glance_info (id, user_id, time, event) values (112, 'b', 1156, 0);
-insert ignore into user_glance_info (id, user_id, time, event) values (113, 'b', 1180, 0);
-insert ignore into user_glance_info (id, user_id, time, event) values (114, 'b', 1200, 0);
-insert ignore into user_glance_info (id, user_id, time, event) values (115, 'b', 1230, 0);
-insert ignore into user_glance_info (id, user_id, time, event) values (116, 'b', 1345, 0);
-insert ignore into user_glance_info (id, user_id, time, event) values (117, 'b', 1370, 0);
-insert ignore into user_glance_info (id, user_id, time, event) values (118, 'b', 1400, 0);
+insert ignore into user_glance_info (id, user_id, time, event)
+values (101, 'a', 1001, 0),
+       (102, 'a', 1005, 0),
+       (103, 'a', 1020, 0),
+       (104, 'a', 1048, 0),
+       (105, 'a', 1078, 0),
+       (106, 'a', 1230, 0),
+       (107, 'a', 1245, 0),
+       (108, 'a', 1270, 0),
+       (109, 'a', 1282, 0),
+       (110, 'b', 1101, 0),
+       (111, 'b', 1132, 0),
+       (112, 'b', 1156, 0),
+       (113, 'b', 1180, 0),
+       (114, 'b', 1200, 0),
+       (115, 'b', 1230, 0),
+       (116, 'b', 1345, 0),
+       (117, 'b', 1370, 0),
+       (118, 'b', 1400, 0);
 
 -- 查询用户在每次会话中的浏览时长、浏览步长，步长表示点击浏览的次数
 select t3.user_id,
@@ -391,17 +394,13 @@ from
     -- 分组排序后，从上到下计算 value 列的累加和，如果求和结果相同，则表示属于相同的会话
     select t2.user_id,
            t2.time,
-           sum(t2.flag) over(partition by t2.user_id order by t2.time) as stage
+           sum(t2.flag) over (partition by t2.user_id order by t2.time) as stage
     from
     (
         -- 如果与前一次点击的时间之差超过 30，则 value 列为 1，否则为 0
         -- value 列为 1 表示这次点击属于一个新的会话，为 0 表示这次点击与前一次属于相同的会话
         select t1.user_id,
-               t1.time,
-               case
-                   when nullif(t1.time - t1.previous, 9999) > 30 then 1                      -- Hive:nvl
-                   else                                               0
-               end                                                      as flag
+               t1.time, if(nullif(t1.time - t1.previous, 9999) > 30, 1, 0) as flag
         from
         (
             -- 按照用户 id 分组，按照点击浏览时间递增排序，计算前后两次点击的时间之差
@@ -433,19 +432,21 @@ create table if not exists discount_info
 (
     id         int  primary key comment '主键',
     brand      int  not null    comment '品牌 ID',
-    start_date date not null    comment '活动开始时间',
-    end_date   date not null    comment '活动结束时间'
+    start_date date not null    comment '活动开始日期',
+    end_date   date not null    comment '活动结束日期'
 ) engine = InnoDB character set = 'utf8mb4' comment '用户浏览信息表';
 
-insert ignore into discount_info (id, brand, start_date, end_date) values (101, 1001, '2022-07-01', '2022-07-03');
-insert ignore into discount_info (id, brand, start_date, end_date) values (102, 1001, '2022-07-05', '2022-07-10');
-insert ignore into discount_info (id, brand, start_date, end_date) values (103, 1002, '2022-07-02', '2022-07-08');
-insert ignore into discount_info (id, brand, start_date, end_date) values (104, 1002, '2022-07-06', '2022-07-09');
-insert ignore into discount_info (id, brand, start_date, end_date) values (105, 1003, '2022-07-12', '2022-07-20');
-insert ignore into discount_info (id, brand, start_date, end_date) values (106, 1003, '2022-07-15', '2022-07-18');
-insert ignore into discount_info (id, brand, start_date, end_date) values (107, 1004, '2022-07-20', '2022-07-25');
-insert ignore into discount_info (id, brand, start_date, end_date) values (108, 1004, '2022-07-22', '2022-07-26');
-insert ignore into discount_info (id, brand, start_date, end_date) values (109, 1004, '2022-07-28', '2022-07-30');
+insert ignore into discount_info (id, brand, start_date, end_date)
+values (101, 1001, '2022-07-01', '2022-07-03'),
+       (102, 1001, '2022-07-05', '2022-07-10'),
+       (103, 1002, '2022-07-02', '2022-07-08'),
+       (104, 1002, '2022-07-06', '2022-07-09'),
+       (105, 1003, '2022-07-12', '2022-07-20'),
+       (106, 1003, '2022-07-15', '2022-07-18'),
+       (107, 1004, '2022-07-20', '2022-07-25'),
+       (108, 1004, '2022-07-22', '2022-07-26'),
+       (109, 1004, '2022-07-28', '2022-07-30');
+
 
 -- -------------------------------------------------------------------------------------------------
 -- rows between ... preceding and ... following ：在 XXX 之前和 XXX 之后的所有记录
@@ -527,23 +528,66 @@ from
 --  1009   2022-07-18   2022-07-19
 --  1010   2022-07-11   2022-07-14
 -- -------------------------------------------------------------------------------------------------
+drop table if exists live;
+create table if not exists live
+(
+    id         int  primary key comment '主键',
+    user_id    int  not null    comment '用户 ID',
+    start_date date not null    comment '开始日期',
+    end_date   date not null    comment '结束日期'
+) engine = InnoDB character set = 'utf8mb4' comment '用户登录退出表';
+
+insert ignore into live (id, user_id, start_date, end_date)
+values (101, '1001', '2022-07-01', '2022-07-02'),
+       (102, '1001', '2022-07-04', '2022-07-05'),
+       (103, '1001', '2022-07-07', '2022-07-10'),
+       (104, '1001', '2022-07-13', '2022-07-18'),
+       (105, '1002', '2022-07-01', '2022-07-02'),
+       (106, '1002', '2022-07-04', '2022-07-05'),
+       (107, '1002', '2022-07-07', '2022-07-08'),
+       (108, '1002', '2022-07-10', '2022-07-11'),
+       (109, '1002', '2022-07-13', '2022-07-14'),
+       (110, '1002', '2022-07-16', '2022-07-17'),
+       (111, '1002', '2022-07-19', '2022-07-20'),
+       (112, '1003', '2022-07-01', '2022-07-20'),
+       (113, '1004', '2022-07-04', '2022-07-08'),
+       (114, '1004', '2022-07-12', '2022-07-16'),
+       (115, '1005', '2022-07-03', '2022-07-06'),
+       (116, '1005', '2022-07-09', '2022-07-11'),
+       (117, '1006', '2022-07-04', '2022-07-06'),
+       (118, '1007', '2022-07-09', '2022-07-12'),
+       (119, '1008', '2022-07-06', '2022-07-08'),
+       (120, '1008', '2022-07-11', '2022-07-13'),
+       (121, '1009', '2022-07-06', '2022-07-08'),
+       (122, '1009', '2022-07-18', '2022-07-19'),
+       (123, '1010', '2022-07-11', '2022-07-14');
+
 select dt,
        online
 from 
 (
     select dt,
-    sum(count) over(order by dt) as online
-    from (
-        select dt, sum(value) as count
-        from (
-            select id, start_dt as dt, 1 as value from live
+           sum(count) over(order by dt) as online
+    from
+    (
+        select dt,
+               sum(value) as count
+        from
+        (
+            select id,
+                   start_date            as dt,
+                   1                     as value
+            from live
             union
-            select id, date_add(end_dt, 1) as dt, -1 as value from live
-        ) t1
-        group by dt
+            select id,
+                   date_add(end_date, 1) as dt,
+                   -1                    as value
+            from live
+        ) t1 group by dt
     ) t2
 ) t3
 order by online desc, dt;
+
 
 -- -------------------------------------------------------------------------------------------------
 -- 给定多个时间段，每个时间段分为开始时间、结束时间，将相互重叠的多个时间段合并为一个区间
@@ -557,30 +601,50 @@ order by online desc, dt;
 -- 7      56      57
 -- 8      16      18
 -- -------------------------------------------------------------------------------------------------
+drop table if exists time_merge;
+create table if not exists time_merge
+(
+    id         int  primary key comment '主键',
+    start_time int not null     comment '开始时间',
+    end_time   int not null     comment '结束时间'
+) engine = InnoDB character set = 'utf8mb4' comment '用户开始结束时间表';
+
+insert ignore into time_merge (id, start_time, end_time)
+values (1, 12, 15),
+       (2, 57, 58),
+       (3, 29, 32),
+       (4, 30, 31),
+       (5, 17, 19),
+       (6, 44, 44),
+       (7, 56, 57),
+       (8, 16, 18);
+
 -- 按照区间序号进行分组，查询每个分组的最小开始时间作为区间开始时间，最大结束时间作为区间结束时间
 select flag,
        min(start_time) as start_time,
        max(end_time) as end_time
 from
 (    -- 判断哪些时间段属于相同区间，flag表示时间段归属的区间序号，值相同表示属于相同区间
-    select id, start_time, end_time,
+    select id,
+           start_time,
+           end_time,
     sum(count) over(order by start_time, end_time) as flag
     from
     (   -- 根据当前结束时间的最大值 max_dt进行比较，标记每个时间段是否为新的区间
         select id,
                start_time,
                end_time,
-        case
-            when max_dt is null then 1 -- 作为一个新的区间
-            when max_dt < start_time then 1 -- 作为一个新的区间
-            else 0
-        end as count -- 与前面的区间具有重叠
+               case
+                   when max_dt is null      then 1 -- 作为一个新的区间
+                   when max_dt < start_time then 1 -- 作为一个新的区间
+                   else                          0
+               end         as count -- 与前面的区间具有重叠
         from
         (   -- 按照开始时间、结束时间递增排序，查询当前结束时间的最大值max_dt
             select id,
                    start_time,
                    end_time,
-                   max(end_time) over(order by start_time, end_time rows between unbounded preceding and 1 preceding) as max_dt
+                   max(end_time) over (order by start_time, end_time rows between unbounded preceding and 1 preceding) as max_dt
             from time_merge
         ) t1
     ) t2
@@ -597,30 +661,44 @@ from
 --   E      B,C
 --   F      C,D
 -- -------------------------------------------------------------------------------------------------
+drop table if exists friend;
+create table if not exists friend
+(
+    id       int         primary key comment '主键',
+    user_id  varchar(2)  not null    comment '用户 ID',
+    friends  varchar(16) not null    comment '好友列表'
+) engine = InnoDB character set = 'utf8mb4' comment '用户好友列表';
+
+insert ignore into friend (id, user_id, friends)
+values (101, 'A', 'B,C,D'),
+       (102, 'B', 'A,C,E'),
+       (103, 'C', 'A,B,D,E,F'),
+       (104, 'D', 'A,C,F'),
+       (105, 'E', 'B,C'),
+       (106, 'F', 'C,D');
+
 -- 按照用户的两两组合进行分组，将所有的共同好友放入列表
 select t1.ids,
        concat_ws(',', collect_list(t1.friend)) as common_friend
 from
 (   -- 将好友关系表与自身进行连接，查询每个用户是哪两个用户的共同好友
-    select a.friend,
+    select a.friends,
            concat(a.id, ',', b.id) as ids
     from friend a join friend b
-        on a.friend = b.friend -- 按照共同好友进行连接
-    where a.id < b.id -- 筛选出重复记录
+        on a.friends = b.friends            -- 按照共同好友进行连接
+    where a.id < b.id                       -- 筛选出重复记录
 ) t1 group by t1.ids;
 
-
--- 给定每个用户的好友列表，好友关系是互相对称的，返回每个用户的可能好友。如果两个用户不是好友关系，并且两者拥有至少一个（或者两个）共同好友，则两者互相是可能好友
+-- 每个用户的可能好友：如果两个用户不是好友关系，并且两者拥有至少一个（或者两个）共同好友，则两者互相是可能好友
 -- 创建临时表，将好友关系分解为最细粒度
 with friend as
 (
     select id,
-           friend
-    from common_friend lateral view explode(split(friends, ',')) temp as friend
+           friends
+    from friend lateral view explode(split(friends, ',')) temp as friend
 )
-
--- 将具有至少两个共同好友的临时表与好友关系表进行连接，如果临时表的两个用户是好友关系，则在好友关系表中存在对应记录，否则不存在对应记录，
--- 表示两者是可能好友
+-- 将具有至少两个共同好友的临时表与好友关系表进行连接，如果临时表的两个用户是好友关系，则在好友关系表中存在对应记录，
+-- 否则不存在对应记录，表示两者是可能好友
 select t2.id1,
        t2.id2
 from
@@ -662,6 +740,31 @@ where friend.id is null; -- 排除真实好友，筛选可能好友
 --   D      3
 --   D      6
 -- -------------------------------------------------------------------------------------------------
+drop table if exists shop;
+create table if not exists shop
+(
+    id        int         primary key comment '主键',
+    user_id   varchar(2)  not null    comment '用户 ID',
+    product   int         not null    comment '商品 ID'
+) engine = InnoDB character set = 'utf8mb4' comment '用户购买商品记录';
+
+insert ignore into shop (id, user_id, product)
+values (101 , 'A', 1),
+       (102 , 'A', 2),
+       (103 , 'A', 1),
+       (104 , 'A', 3),
+       (105 , 'B', 2),
+       (106 , 'B', 3),
+       (107 , 'B', 4),
+       (108 , 'B', 5),
+       (109 , 'B', 2),
+       (110 , 'C', 1),
+       (111 , 'C', 2),
+       (112 , 'C', 1),
+       (113 , 'D', 1),
+       (114 , 'D', 3),
+       (115 , 'D', 6);
+
 -- 按照用户、商品进行分组、去重
 with temp as
 (
@@ -670,7 +773,6 @@ with temp as
     from shop
     group by id, product
 )
-
 -- 将已购买与推荐购买的临时表与已购买表进行连接，如果临时表的商品已购买，则在已购买表中存在对应记录，否则不存在对应记录，表示推荐商品
 select t4.id1 as id,
        t4.product
@@ -695,14 +797,14 @@ from
                 from temp a join temp b
                      on  a.product = b.product
                      and a.id     != b.id
-            ) t1 group by t1.id1, t1.id2 having count(t1.product) >= 2
+            ) t1 group by t1.id1, t1.id2
+                 having count(t1.product) >= 2
         ) t2 join temp on t2.id2 = temp.id
     ) t3 group by t3.id1, t3.product
 ) t4 left join temp
          on  t4.product = temp.product
-         and t4.id1 = temp.id -- 相同用户购买相同商品
-where temp.product is null; -- 排除已购买商品，筛选推荐商品
-
+         and t4.id1    = temp.id                 -- 相同用户购买相同商品
+where temp.product is null;                      -- 排除已购买商品，筛选推荐商品
 
 
 -- -------------------------------------------------------------------------------------------------
@@ -732,86 +834,102 @@ where temp.product is null; -- 排除已购买商品，筛选推荐商品
 --   c     20220325
 --   f     20220325
 -- -------------------------------------------------------------------------------------------------
--- 新增用户：需要一张全量的用户表，一张某日的登录行为表
--- 将日期20220321的登录用户作为初始表，表示已知的用户，然后查询日期20220322的新增用户
--- 登录行为表与全量用户表进行关联，行为表中存在、用户表中不存在的记录表示这个日期的新增用户
--- 查询出每个日期的新增用户后，需要追加到全量的用户表中
-
 -- 全量的用户表：表示用户成为新增用户的日期
-create table user_add(uid string, add_date int);
-insert into table user_add (select * from login_action where login_date = 20220321);
+drop table if exists login_action;
+create table if not exists login_action
+(
+    id         int         primary key comment '主键',
+    uid        varchar(2)  not null    comment '用户 ID',
+    login_date int         not null    comment '登录日期'
+) engine = InnoDB character set = 'utf8mb4' comment '用户登录日期';
 
-select t1.uid,
-       t1.login_date
-from login_action t1 left join user_add t2
-     on t1.uid = t2.uid
-where t1.login_date = 20220322 -- 查询日期20220322的新增用户
-and t2.uid is null; -- 查询在用户表中不存在的记录，即这个日期的新增用户
+insert ignore into login_action (id, uid, login_date)
+values (101, 'd', 20220321),
+       (102, 'e', 20220321),
+       (103, 'f', 20220321),
+       (104, 'a', 20220322),
+       (105, 'b', 20220322),
+       (106, 'd', 20220322),
+       (107, 'a', 20220323),
+       (108, 'b', 20220323),
+       (109, 'c', 20220323),
+       (110, 'a', 20220324),
+       (111, 'b', 20220324),
+       (112, 'c', 20220324),
+       (113, 'a', 20220325),
+       (114, 'b', 20220325),
+       (115, 'c', 20220325),
+       (116, 'f', 20220325);
 
+drop table if exists user_add;
+create table if not exists user_add
+(
+    id       int         primary key comment '主键',
+    uid      varchar(2)  not null    comment '用户 ID',
+    add_date int         not null    comment '登录日期'
+) engine = InnoDB character set = 'utf8mb4' comment '用户登录日期';
 
+insert into user_add (id, uid, add_date)
+select id, uid, login_date
+from login_action
+where login_date = 20220321;
 
--- 留存用户：需要一张全量的用户表，一张某日的登录行为表
--- 登录行为表与全量用户表进行关联，行为表中的登录日期与用户表中的登录日期之差为1天，表示1日的留存用户
--- 使用union all合并1日、2日的留存用户
+-- 新增用户：登录行为表与全量用户表进行关联，行为表中存在、用户表中不存在的记录表示这个日期的新增用户
+select la.uid,
+       la.login_date
+from login_action la left join user_add ua
+     on la.uid = ua.uid
+where la.login_date = 20220322              -- 查询日期 20220322 的新增用户
+and ua.uid is null;                         -- 查询在用户表中不存在的记录，即这个日期的新增用户
 
-select t1.uid,
-       t1.login_date,
-       t2.add_date
-from login_action t1 join user_add t2 on t1.uid = t2.uid
-where t1.login_date = 20220324 -- 查询日期20220324的留存用户
-      and t2.add_date = (20220324 - 1) -- 查询1日留存用户
+-- 留存用户：登录行为表与全量用户表进行关联，行为表中的登录日期与用户表中的登录日期之差为 1 天，表示 1 日的留存用户
+select la.uid,
+       la.login_date,
+       ua.add_date
+from login_action la join user_add ua
+    on    la.uid = ua.uid
+where     la.login_date = 20220324          -- 查询日期 20220324 的留存用户
+      and ua.add_date   = (20220324 - 1)    -- 查询 1 日留存用户
+union all                                   -- 合并 1 日、2 日留存用户
+select la.uid,
+       la.login_date,
+       ua.add_date
+from login_action la join user_add ua
+    on  la.uid        = ua.uid
+where   la.login_date = 20220324            -- 查询日期 20220324 的留存用户
+    and ua.add_date   = (20220324 - 2);     -- 查询 2 日留存用户
 
-union all -- 合并1日、2日留存用户
-
-select t1.uid,
-       t1.login_date,
-       t2.add_date
-from login_action t1
-join user_add t2 on t1.uid = t2.uid
-where t1.login_date = 20220324     -- 查询日期20220324的留存用户
-and t2.add_date = (20220324 - 2);  -- 查询2日留存用户
-
-
--- 流失用户：需要一张全量的登录行为表
--- 查询每个用户的登录日期的最大值，与当前日期之差超过2日，表示流失用户
-
+-- 流失用户：每个用户的登录日期的最大值，与当前日期之差超过 2 日，表示流失用户
 select uid,
        max(login_date) as last_login
 from login_action
-where login_date <= 20220325 -- 查询日期20220325的流失用户
+where login_date <= 20220325            -- 查询日期 20220325 的流失用户
 group by uid
-having max(login_date) < (20220325 - 2); -- 超过2日表示流失用户
+having max(login_date) < (20220325 - 2); -- 超过 2 日表示流失用户
 
-
--- 沉默用户：需要一张全量的登录行为表
--- 查询每个用户的登录日期的数量，只有一次登录操作，表示沉默用户
-
+-- 沉默用户：查询每个用户的登录日期的数量，只有一次登录操作，表示沉默用户
 select uid,
        max(login_date) as once_login
 from login_action
 group by uid
-having count(login_date) = 1; -- 只有一次登录操作的用户表示沉默用户
+having count(login_date) = 1;          -- 只有一次登录操作的用户表示沉默用户
 
-
-
--- 回流用户：需要一张全量的登录行为表
--- 日期20220325的活跃用户，如果在之前的日期为流失用户，则在日期20220325为回流用户
-select t1.uid,
-       t1.login_date,
-       t2.last_login
+-- 回流用户：日期 20220325 的活跃用户，如果在之前的日期为流失用户，则在日期 20220325 为回流用户
+select la.uid,
+       la.login_date,
+       ua.last_login
 from
 (
     select uid,
            login_date
     from login_action
-    where login_date = 20220325 -- 查询20220325的活跃用户
-) t1 join
+    where login_date = 20220325                  -- 查询 20220325 的活跃用户
+) la join
 (
     select uid,
            max(login_date) as last_login
     from login_action
-    where login_date < 20220325 -- 查询20220325之前的流失用户
+    where login_date < 20220325                  -- 查询20220325之前的流失用户
     group by uid
     having max(login_date) < (20220325 - 2)
-) t2 on t1.uid = t2.uid;
-
+) ua on la.uid = ua.uid;

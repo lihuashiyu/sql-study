@@ -1238,7 +1238,7 @@ from
       t2.sku_id,
       count(*)over(partition by t2.sku_id,t2.rymd) cn
     from
-      (
+    (
         select
           t1.sku_id,
           add_months(t1.ymd,-row_number()over(partition by t1.sku_id order by t1.ymd)) rymd
@@ -1942,9 +1942,10 @@ from
       1=1
     group by
       uld.user_id,t1.today
-    )t2
-group by
-  t2.level
+    ) t2
+group by t2.level
+
+
 2.38 连续签到领金币数
 用户每天签到可以领1金币，并可以累计签到天数，连续签到的第3、7天分别可以额外领2和6金币。
 每连续签到7天重新累积签到天数。

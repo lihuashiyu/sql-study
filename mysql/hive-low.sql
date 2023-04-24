@@ -511,4 +511,3 @@ inner join score_info si
 inner join course_info ci
     on si.course_id = ci.course_id
 order by t.avg_score desc;
-

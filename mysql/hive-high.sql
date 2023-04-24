@@ -29,15 +29,13 @@ values (100, 1, '2021-12-01 19:00:00', '2021-12-01 19:28:00'),
        (105, 2, '2021-12-01 19:10:00', '2021-12-01 19:18:00'),
        (106, 3, '2021-12-01 19:01:00', '2021-12-01 21:10:00');
 
-
-
 select live_id,
        max(user_count) max_user_count
 from
 (
     select user_id,
            live_id,
-           sum(user_change) over(partition by live_id order by event_time) user_count
+           sum(user_change) over (partition by live_id order by event_time) as user_count
     from
     (
         select user_id,
@@ -54,6 +52,8 @@ from
     ) as t1
 ) as t2
 group by live_id;
+
+
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 会话划分问题：表中有每个用户的每次页面访问记录
 -- 规定若同一用户的相邻两次访问记录时间间隔小于 60s，认为两次浏览记录属于同一会话，为属于同一会话的访问记录增加一个相同的会话 ID 字段
@@ -104,26 +104,27 @@ values (100, 'home',        1659950435),
        (103, 'good_detail', 1659950552),
        (103, 'cart',        1659950563);
 
-
 select user_id,
        page_id,
        view_timestamp,
-       concat(user_id, '-', sum(session_start_point) over (partition by user_id order by view_timestamp)) session_id
+       concat(user_id, '-', sum(session_start_point) over (partition by user_id order by view_timestamp)) as session_id
 from
 (
     select user_id,
            page_id,
            view_timestamp,
-           if(view_timestamp - lagts >= 60, 1, 0) session_start_point
+           if(view_timestamp - lagts >= 60, 1, 0) as session_start_point
     from
     (
         select user_id,
                page_id,
                view_timestamp,
-               lag(view_timestamp, 1, 0) over (partition by user_id order by view_timestamp) lagts
+               lag(view_timestamp, 1, 0) over (partition by user_id order by view_timestamp) as lagts
         from page_view_events
     ) as t1
 ) as t2;
+
+
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 间断连续登录用户问题：记录了一个用户何时登录了平台
 -- 现要求统计各用户最长的连续登录天数，间断一天也算作连续，例如：一个用户在 1,3,5,6 登录，则视为连续 6 天登录
@@ -159,35 +160,34 @@ values (100, '2021-12-01 19:00:00'),
        (104, '2021-12-02 22:57:00'),
        (105, '2021-12-01 10:01:00');
 
-
 select user_id,
-       max(recent_days) max_recent_days  -- 求出每个用户最大的连续天数
+       max(recent_days) max_recent_days                                   -- 求出每个用户最大的连续天数
 from
 (
     select user_id,
            user_flag,
-           datediff(max(login_date),min(login_date)) + 1 recent_days -- 按照分组求每个用户每次连续的天数(记得加1)
+           datediff(max(login_date),min(login_date)) + 1 as recent_days   -- 按照分组求每个用户每次连续的天数(记得加1)
     from
     (
         select user_id,
                login_date,
-               lag1_date,
-               concat(user_id,'_',flag) user_flag -- 拼接用户和标签分组
+               lag_date,
+               concat(user_id,'_',flag) user_flag                         -- 拼接用户和标签分组
         from
         (
             select user_id,
                    login_date,
-                   lag1_date,
-                   sum(if(datediff(login_date,lag1_date)>2,1,0)) over(partition by user_id order by login_date) flag  -- 获取大于2的标签
+                   lag_date,
+                   sum(if(datediff(login_date, lag_date) > 2, 1, 0)) over (partition by user_id order by login_date) as flag  -- 获取大于2的标签
             from
             (
                 select user_id,
                        login_date,
-                       lag(login_date,1,'1970-01-01') over(partition by user_id order by login_date) lag1_date  -- 获取上一次登录日期
+                       lag(login_date,1,'1970-01-01') over(partition by user_id order by login_date) as lag_date  -- 获取上一次登录日期
                 from
                 (
                     select user_id,
-                           date_format(login_datetime, 'yyyy-MM-dd') login_date
+                           date_format(login_datetime, 'yyyy-MM-dd') as login_date
                     from login_events
                     group by user_id, date_format(login_datetime, 'yyyy-MM-dd')  -- 按照用户和日期去重
                 ) as t1
@@ -197,6 +197,8 @@ from
     group by user_id, user_flag
 ) as t5
 group by user_id;
+
+
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 日期交叉问题：记录了每个品牌的每个优惠活动的周期，其中同一品牌的不同优惠活动的周期可能会有交叉
 -- 现要求统计每个品牌的优惠总天数，若某个品牌在同一天有多个优惠活动，则只按一天计算
@@ -207,7 +209,7 @@ group by user_id;
 --  huawei  22
 -- ---------------------------------------------------------------------------------------------------------------------
 drop table if exists promotion_info;
-create table promotion_info
+create table if not exists promotion_info
 (
     promotion_id varchar(64) comment '优惠活动id',
     brand        varchar(64) comment '优惠品牌',
@@ -227,21 +229,20 @@ values (1, 'oppo',    '2021-06-05', '2021-06-09'),
        (9, 'huawei',  '2021-06-09', '2021-06-15'),
        (10, 'huawei', '2021-06-17', '2021-06-21');
 
-
 select brand,
-       sum(datediff(end_date,start_date)+1) promotion_day_count
+       sum(datediff(end_date, start_date) + 1) as promotion_day_count
 from
 (
     select brand,
            max_end_date,
-           if(max_end_date is null or start_date > max_end_date, start_date, date_add(max_end_date, 1)) start_date,
+           if(max_end_date is null or start_date > max_end_date, start_date, date_add(max_end_date, 1)) as start_date,
            end_date
     from
     (
         select brand,
                start_date,
                end_date,
-               max(end_date) over (partition by brand order by start_date rows between unbounded preceding and 1 preceding) max_end_date
+               max(end_date) over (partition by brand order by start_date rows between unbounded preceding and 1 preceding) as max_end_date
         from promotion_info
     ) as t1
 ) as t2

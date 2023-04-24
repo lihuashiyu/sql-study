@@ -717,87 +717,24 @@ create table if not exists ware_sku
 -- -------------------------------------------------------------------------------------------------
 drop view if exists base_category_view;
 create algorithm = undefined sql security definer view base_category_view as
-    select base_category3.id   as id,
-           base_category1.id   as category1_id,
-           base_category1.name as category1_name,
-           base_category2.id   as category2_id,
-           base_category2.name as category2_name,
-           base_category3.id   as category3_id,
-           base_category3.name as category3_name
-    from
-    (
-         (
-             base_category1 join base_category2 on base_category1.id = base_category2.category1_id
-         )                  join base_category3 on base_category2.id = base_category3.category2_id
-    );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+select base_category3.id   as id,
+       base_category1.id   as category1_id,
+       base_category1.name as category1_name,
+       base_category2.id   as category2_id,
+       base_category2.name as category2_name,
+       base_category3.id   as category3_id,
+       base_category3.name as category3_name
+from
+(
+     (
+         base_category1 join base_category2 on base_category1.id = base_category2.category1_id
+     )                  join base_category3 on base_category2.id = base_category3.category2_id
+);
+
+
+-- -------------------------------------------------------------------------------------------------
+-- Data
+-- -------------------------------------------------------------------------------------------------
 insert into activity_info (id, activity_name, activity_type, activity_desc, start_time, end_time, create_time)
 values  (1, '联想专场', '3101', '联想满减', '2023-02-27 22:08:37', '2023-02-27 22:08:37', null),
         (2, 'Apple品牌日', '3101', 'Apple品牌日', '2023-02-27 22:08:37', '2023-02-27 22:08:37', null),
@@ -811,7 +748,7 @@ values  (1, 1, '3101', 10000.00, null, 500.00, null, 1),
         (5, 3, '3102', null, 3, null, 0.10, 1),
         (6, 3, '3102', null, 5, null, 0.20, 2);
 
-insert into at_gui_gu.activity_sku (id, activity_id, sku_id, create_time)
+insert into activity_sku (id, activity_id, sku_id, create_time)
 values  (1, 1, 11, null),
         (2, 1, 12, null),
         (3, 1, 13, null),
@@ -827,7 +764,7 @@ values  (1, 1, 11, null),
         (13, 3, 30, null),
         (14, 3, 31, null);
 
-insert into at_gui_gu.base_attr_info (id, attr_name, category_id, category_level)
+insert into base_attr_info (id, attr_name, category_id, category_level)
 values  (23, '运行内存', 61, 3),
         (24, '机身内存', 61, 3),
         (25, '处理器', 285, 3),
@@ -870,20 +807,3 @@ values  (23, '运行内存', 61, 3),
         (112, '香水彩妆', 477, 3),
         (113, '面部护肤', 477, 3),
         (114, '香调', 473, 3);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
