@@ -25,24 +25,7 @@ insert into student (id, name, age, gender, hight, wight, email, remark) values 
 explain formatted select * from student s inner join student t on s.age = t.age;
 select * from student o inner join student n on o.age = n.age where o.id = 4;
 select * from student limit 4;
-
-show tables;
-select count(*) from course_pay;                                     -- 19991649(01:53)
-select count(*) from course_shopping_cart;                           -- 29992457(02:04)
-select count(*) from sale_course;                                    -- 10000(02:07)
-select count(*) from sale_course_detail;                             -- 29992457(02:06)
 select count(*) from student;                                        -- 2(00:01)
-select count(*) from test_school;                                     -- 1000000(02:21)
-select count(*) from test_student;                                   -- 1000001(02:20)
-
-describe formatted course_shopping_cart;
-explain formatted select * from course_shopping_cart;
-select * from student limit 10;
-
-truncate table student;
-show create table student;
-
-show tables ;
 
 drop table if exists movie_tmp;
 create temporary table if not exists movie_tmp
@@ -74,4 +57,3 @@ select movie_class, movie_code, movie_name, movie_type, stage, url from movie_tm
 
 select * from movie limit 10;
 select movie_class, count(movie_class) as count from movie where movie_class >= 0 group by movie_class order by movie_class;
-

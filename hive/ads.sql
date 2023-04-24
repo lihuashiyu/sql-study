@@ -1,11 +1,19 @@
 -- -------------------------------------------------------------------------------------------------
+-- 创建数据库
+-- drop database if exists warehouse;
+-- create database if not exists warehouse;
+-- use warehouse;
+-- -------------------------------------------------------------------------------------------------
+
+
+-- -------------------------------------------------------------------------------------------------
 -- 各渠道流量统计
 -- -------------------------------------------------------------------------------------------------
 drop table if exists ads_traffic_stats_by_channel;
 create external table if not exists ads_traffic_stats_by_channel
 (
     dt               string         comment '统计日期',
-    recent_days      bigint         comment '最近天数,1:最近1天,7:最近7天,30:最近30天',
+    recent_days      bigint         comment '最近天数,1：最近1天，7：最近7天，30：最近30天',
     channel          string         comment '渠道',
     uv_count         bigint         comment '访客人数',
     avg_duration_sec bigint         comment '会话平均停留时长，单位为秒',
@@ -40,7 +48,7 @@ drop table if exists ads_page_path;
 create external table if not exists ads_page_path
 (
     dt          string comment '统计日期',
-    recent_days bigint comment '最近天数,1:最近1天,7:最近7天,30:最近30天',
+    recent_days bigint comment '最近天数,1：最近1天,7：最近7天,30：最近30天',
     source      string comment '跳转起始页面ID',
     target      string comment '跳转终到页面ID',
     path_count  bigint comment '跳转次数'
@@ -56,8 +64,8 @@ select '2021-08-15' dt, recent_days, source, nvl(target, 'null'), count(*) path_
     from 
     (
         select recent_days, 
-               concat('step-', rn, ':', page_id)          source, 
-               concat('step-', rn + 1, ':', next_page_id) target
+               concat('step-', rn, '：', page_id)          source, 
+               concat('step-', rn + 1, '：', next_page_id) target
         from 
         (
             select recent_days,
@@ -160,7 +168,7 @@ drop table if exists ads_user_stats;
 create external table if not exists ads_user_stats
 (
     dt                string comment '统计日期',
-    recent_days       bigint comment '最近n日,1:最近1日,7:最近7日,30:最近30日',
+    recent_days       bigint comment '最近n日,1：最近1日,7：最近7日,30：最近30日',
     new_user_count    bigint comment '新增用户数',
     active_user_count bigint comment '活跃用户数'
 ) comment '用户新增活跃统计' row format delimited fields terminated by '\t' 
@@ -198,7 +206,7 @@ drop table if exists ads_user_action;
 create external table if not exists ads_user_action
 (
     dt                string comment '统计日期',
-    recent_days       bigint comment '最近天数,1:最近1天,7:最近7天,30:最近30天',
+    recent_days       bigint comment '最近天数,1：最近1天,7：最近7天,30：最近30天',
     home_count        bigint comment '浏览首页人数',
     good_detail_count bigint comment '浏览商品详情页人数',
     cart_count        bigint comment '加入购物车人数',
@@ -303,7 +311,7 @@ drop table if exists ads_new_buyer_stats;
 create external table if not exists ads_new_buyer_stats
 (
     dt                     string comment '统计日期',
-    recent_days            bigint comment '最近天数,1:最近1天,7:最近7天,30:最近30天',
+    recent_days            bigint comment '最近天数,1：最近1天,7：最近7天,30：最近30天',
     new_order_user_count   bigint comment '新增下单人数',
     new_payment_user_count bigint comment '新增支付人数'
 ) comment '新增交易用户统计' row format delimited fields terminated by '\t' 
@@ -341,7 +349,7 @@ drop table if exists ads_repeat_purchase_by_tm;
 create external table if not exists ads_repeat_purchase_by_tm
 (
     dt                string comment '统计日期',
-    recent_days       bigint comment '最近天数,7:最近7天,30:最近30天',
+    recent_days       bigint comment '最近天数,7：最近7天,30：最近30天',
     tm_id             string comment '品牌ID',
     tm_name           string comment '品牌名称',
     order_repeat_rate decimal(16, 2) comment '复购率'
@@ -387,7 +395,7 @@ drop table if exists ads_trade_stats_by_tm;
 create external table if not exists ads_trade_stats_by_tm
 (
     dt                      string comment '统计日期',
-    recent_days             bigint comment '最近天数,1:最近1天,7:最近7天,30:最近30天',
+    recent_days             bigint comment '最近天数,1：最近1天,7：最近7天,30：最近30天',
     tm_id                   string comment '品牌ID',
     tm_name                 string comment '品牌名称',
     order_count             bigint comment '订单数',
@@ -476,7 +484,7 @@ drop table if exists ads_trade_stats_by_cate;
 create external table if not exists ads_trade_stats_by_cate
 (
     dt                      string comment '统计日期',
-    recent_days             bigint comment '最近天数,1:最近1天,7:最近7天,30:最近30天',
+    recent_days             bigint comment '最近天数,1：最近1天,7：最近7天,30：最近30天',
     category1_id            string comment '一级分类id',
     category1_name          string comment '一级分类名称',
     category2_id            string comment '二级分类id',
@@ -672,7 +680,7 @@ drop table if exists ads_trade_stats;
 create external table if not exists ads_trade_stats
 (
     dt                      string         comment '统计日期',
-    recent_days             bigint         comment '最近天数,1:最近1日,7:最近7天,30:最近30天',
+    recent_days             bigint         comment '最近天数,1：最近1日,7：最近7天,30：最近30天',
     order_total_amount      decimal(16, 2) comment '订单总额,GMV',
     order_count             bigint         comment '订单数',
     order_user_count        bigint         comment '下单人数',
@@ -750,7 +758,7 @@ drop table if exists ads_order_by_province;
 create external table if not exists ads_order_by_province
 (
     dt                 string         comment '统计日期',
-    recent_days        bigint         comment '最近天数,1:最近1天,7:最近7天,30:最近30天',
+    recent_days        bigint         comment '最近天数,1：最近1天,7：最近7天,30：最近30天',
     province_id        string         comment '省份ID',
     province_name      string         comment '省份名称',
     area_code          string         comment '地区编码',

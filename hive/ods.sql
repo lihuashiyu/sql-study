@@ -1,7 +1,12 @@
-drop database if exists warehouse;
-create database if not exists warehouse;
-use warehouse;
-show tables ;
+-- -------------------------------------------------------------------------------------------------
+-- 初始化数据库
+--
+-- drop database if exists at_gui_gu;
+-- create database if not exists at_gui_gu;
+-- use at_gui_gu;
+-- show tables;
+-- -------------------------------------------------------------------------------------------------
+
 
 -- -------------------------------------------------------------------------------------------------
 -- 日志表
