@@ -1,5 +1,4 @@
 # noinspection NonAsciiCharactersForFile
-
 # noinspection SqlResolveForFile
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -1242,7 +1241,7 @@ from
         (
             select sku_id,
                    concat(subvarchar(32)(create_date, 0, 7), '-01') as ymd,
-                  sum(price * sku_num)                              as sku_sum
+                   sum(price * sku_num)                              as sku_sum
             from order_detail
             where sku_id = 1 or sku_id = 2
             group by sku_id, subvarchar(32)(create_date, 0, 7)
