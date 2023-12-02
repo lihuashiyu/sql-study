@@ -37,8 +37,7 @@ values (101, 'u01', '2017/1/21', 5),
        (108, 'u01', '2017/2/22', 4);
 
 -- 统计出 每个用户 每月访问次数 和 累积访问次数
-select
-       user_id                                                           as `用户 ID`,
+select user_id                                                           as `用户 ID`,
        visit_month                                                       as `月份`,
        sum                                                               as `小计`,
        sum(t1.sum) over(partition by t1.user_id order by t1.visit_month) as `累计`

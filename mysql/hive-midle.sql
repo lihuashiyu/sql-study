@@ -1,3 +1,5 @@
+# noinspection SqlSignatureForFile
+
 # noinspection NonAsciiCharactersForFile
 # noinspection SqlResolveForFile
 
@@ -1191,23 +1193,35 @@ group by t3.user_id;
 -- 104
 -- 107
 -- ---------------------------------------------------------------------------------------------------------------------
-select t2.user_id
+select user_id
 from
 (
-    select t1.user_id,
-           if(t1.max_logout is null, 2, if(t1.max_logout < t1.login_ts, 1, 0)) as flag
-    from
-    (
-        select user_id,
-               ip_address,
-               login_ts,
-               logout_ts,
-               max(logout_ts) over (partition by user_id order by login_ts rows between unbounded preceding and 1 preceding) as max_logout
-        from user_login_detail
-    ) as t1
-) as t2
-where t2.flag = 0
-group by t2.user_id;
+    select user_id,
+           logout_ts                                                                       as ts1,
+           ip_address                                                                      as ip1,
+           lead(login_ts,   1, '9999-12-31') over (partition by user_id order by login_ts) as ts2,
+           lead(ip_address, 1, 0)            over (partition by user_id order by login_ts) as ip2
+    from user_login_detail
+) as t1
+where ts1 > ts2 and ip1 != ip2;
+
+-- select t2.user_id
+-- from
+-- (
+--     select t1.user_id,
+--            if(t1.max_logout is null, 2, if(t1.max_logout < t1.login_ts, 1, 0)) as flag
+--     from
+--     (
+--         select user_id,
+--                ip_address,
+--                login_ts,
+--                logout_ts,
+--                max(logout_ts) over (partition by user_id order by login_ts rows between unbounded preceding and 1 preceding) as max_logout
+--         from user_login_detail
+--     ) as t1
+-- ) as t2
+-- where t2.flag = 0
+-- group by t2.user_id;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 销售额完成任务指标的商品：商家要求每个商品每个月需要售卖出一定的销售总额
@@ -1216,37 +1230,31 @@ group by t2.user_id;
 -- sku_id：商品id
 -- 1
 -- ---------------------------------------------------------------------------------------------------------------------
--- 求出1号商品  和  2号商品 每个月的购买总额 并过滤掉没有满足指标的商品
-select sku_id,
-       concat(subvarchar(32)(create_date, 0, 7), '-01') as ymd,
-       sum(price * sku_num)                             as sku_sum
-from order_detail
-where    sku_id = 1
-      or sku_id = 2
-group by sku_id, subvarchar(32)(create_date, 0, 7)
-having (sku_id = 1 and sku_sum >= 21000)
-    or (sku_id = 2 and sku_sum >= 10000);
-
--- 判断是否为连续两个月
 select distinct t3.sku_id
 from
 (
     select t2.sku_id,
-           count(*) over (partition by t2.sku_id,t2.rymd) as cn
+           count(*) over (partition by t2.sku_id, t2.rymd) as cn  -- 判断是否为连续两个月
     from
     (
         select t1.sku_id,
                add_months(t1.ymd, - row_number() over (partition by t1.sku_id order by t1.ymd)) as rymd
         from
         (
-            select sku_id,
-                   concat(subvarchar(32)(create_date, 0, 7), '-01') as ymd,
-                   sum(price * sku_num)                              as sku_sum
-            from order_detail
-            where sku_id = 1 or sku_id = 2
-            group by sku_id, subvarchar(32)(create_date, 0, 7)
-            having (sku_id = 1 and sku_sum >= 21000)
-                or (sku_id = 2 and sku_sum >= 10000)
+            -- 求出 1 号商品和 2 号商品 每个月的购买总额 并过滤掉没有满足指标的商品
+            select od.sku_id,
+                   od.create_month,
+                   sum(od.sku_price) as sku_sum
+            from
+            (
+                select sku_id,
+                       date_format(create_date, 'yyyy-MM') as create_month,
+                       price * sku_num                     as sku_price
+                from order_detail
+                where sku_id = 1 or sku_id = 2
+            ) as od
+            group by od.sku_id, od.create_month
+            having (od.sku_id = 1 and sku_sum >= 21000) or (od.sku_id = 2 and sku_sum >= 10000)
         ) as t1
     ) as t2
 ) as t3 where t3.cn >= 2;
@@ -1315,88 +1323,36 @@ where t2.rk <= 3;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 各品类中商品价格的中位数
--- 从商品（sku_info）中球中位数如果是偶数则输出中间两个值的平均值，如果是奇数，则输出中间数即可。
--- Category_id：品类id、 Medprice：中位数
+-- 从商品信息表（sku_info）求出各分类商品价格的中位数，如果一个分类下的商品个数为偶数，则输出中间两个值的平均值，如果是奇数，则输出中间数即可
+-- category_id：品类id、 median_price：中位数
 -- 1    3500.0
 -- 2    1250.0
 -- 3    510.0
 -- ---------------------------------------------------------------------------------------------------------------------
--- 求个每个品类 价格排序 商品数量 以及打上奇偶数的标签
-select sku_id,
-       category_id,
-       price,
-       row_number() over (partition by category_id order by price desc) as rk,
-       count(*) over (partition by category_id)                         as cn,
-       count(*) over (partition by category_id) % 2                     as falg
-from sku_info t1;
-
--- 求出偶数品类的中位数
-select distinct t1.category_id,
-                avg(t1.price) over (partition by t1.category_id) as medprice
-from
+with common_data as                             -- 求个每个品类 价格排序 商品数量 以及打上奇偶数的标签
 (
-    select sku_id,
-           category_id,
+    select category_id,
            price,
-           row_number() over (partition by category_id order by price desc) as rk,
-           count(*) over (partition by category_id)                         as cn,
-           count(*) over (partition by category_id) % 2                     as falg
+           row_number() over (partition by category_id order by price desc) as rn,
+           count(*)     over (partition by category_id)                     as cn,
+           count(*)     over (partition by category_id) % 2                 as flag
     from sku_info
-) t1
-where     t1.falg = 0
-      and (t1.rk = cn / 2 or t1.rk = cn / 2 + 1);
-
--- 求出奇数品类的中位数
-select t1.category_id,
-       t1.price
-from
-(
-    select sku_id,
-           category_id,
-           price,
-           row_number() over (partition by category_id order by price desc) as rk,
-           count(*) over (partition by category_id)                         as cn,
-           count(*) over (partition by category_id) % 2                     as falg
-    from sku_info
-) as t1
-where     t1.falg = 1
-      and t1.rk = round(cn / 2);
-
--- 竖向拼接
-select distinct t1.category_id,
-                avg(t1.price) over (partition by t1.category_id) as medprice
-from
-(
-    select sku_id,
-           category_id,
-           price,
-           row_number() over (partition by category_id order by price desc) as rk,
-           count(*) over (partition by category_id)                         as cn,
-           count(*) over (partition by category_id) % 2                     as falg
-    from sku_info
-) t1
-where     t1.falg = 0
-      and (t1.rk = cn / 2 or t1.rk = cn / 2 + 1)
+)
+select category_id,
+       cast(round(avg(price) over (partition by category_id), 2) as decimal(16, 2)) as median_price
+from common_data
+where flag = 0 and(rn = round(cn / 2, 0) or rn = round(cn / 2, 0) + 1)       -- 求出偶数品类的中位数
 union
-select t1.category_id,
-       t1.price / 1     as medprice
-from
-(
-    select sku_id,
-           category_id,
-           price,
-           row_number() over (partition by category_id order by price desc) as rk,
-           count(*) over (partition by category_id)                         as cn,
-           count(*) over (partition by category_id) % 2                     as falg
-    from sku_info
-) t1
-where     t1.falg = 1
-      and t1.rk = round(cn / 2);
+select category_id,
+       cast(price as decimal(16, 2))                                                as median_price
+from common_data
+where flag = 1 and rn = round(cn / 2, 0);                                    -- 求出奇数品类的中位数
+
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 找出销售额连续3天超过100的商品
+-- 找出销售额连续 3 天超过 100 的商品
 -- 从订单详情表（order_detail）中找出销售额连续 3 天超过 100 的商品
--- Sku_id：商品 ID
+-- sku_id：商品 ID
 -- 1
 -- 10
 -- 11
@@ -1410,15 +1366,6 @@ where     t1.falg = 1
 -- 8
 -- 9
 -- ---------------------------------------------------------------------------------------------------------------------
--- 每个商品每天的销售总额
-select sku_id,
-       create_date,
-       sum(price * sku_num) as sku_sum
-from order_detail
-group by sku_id, create_date
-having sku_sum >= 100;
-
---  判断连续三天以上
 select distinct t3.sku_id
 from
 (
@@ -1431,6 +1378,7 @@ from
                date_sub(t1.create_date, rank() over (partition by t1.sku_id order by t1.create_date)) as date_drk
         from
         (
+            -- 每个商品每天的销售总额
             select sku_id,
                    create_date,
                    sum(price * sku_num) as sku_sum
@@ -1439,7 +1387,7 @@ from
             having sku_sum >= 100
         ) as t1
     ) as t2
-) as t3 where t3.rk >= 3;
+) as t3 where t3.rk >= 3;                                                   --  判断连续三天以上
 
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -1456,27 +1404,65 @@ from
 -- 2021-10-04    2    0.5
 -- 2021-10-06    1    0.0
 -- ---------------------------------------------------------------------------------------------------------------------
--- 每个用户首次登录时间 和 第二天是否登录 并看每天新增和留存数量
-select t1.first_login,
-       count(t1.user_id) as register,
-       count(t2.user_id) as remain_1
-from
+with tmp1 as
 (
     select user_id,
-           date_format(min(login_ts), 'yyyy-MM-dd') as first_login
-    from user_login_detail
-    group by user_id
-) as t1 left join user_login_detail t2
-    on      t1.user_id = t2.user_id
-        and datediff(date_format(t2.login_ts, 'yyyy-MM-dd'), t1.first_login) = 1
-group by t1.first_login;
+           login_ts,
+           rn
+    from
+    (
+        select user_id,
+               date_format(login_ts, 'yyyy-MM-dd')                        as login_ts,
+               row_number() over (partition by user_id order by login_ts) as rn
+        from user_login_detail
+    ) a
+    where a.rn <= 2
+),
+tmp2 as
+(
+    select login_ts as first_login,
+           count(*) as register
+    from tmp1
+    where rn = 1
+    group by login_ts
+    order by login_ts
+),
+liucun as
+(
+    select a.user_id,
+           a.login_ts as first_login,
+           b.login_ts as second_login
+    from
+    (
+        select *
+        from tmp1
+        where rn = 1
+    ) as a
+    join
+    (
+        select *
+        from tmp1
+        where rn = 2
+    ) as b on a.user_id = b.user_id and datediff(b.login_ts, a.login_ts) = 1
+)
+select tmp2.first_login,
+       tmp2.register,
+       cast((nvl(lc.cnt, 0) / tmp2.register) as decimal(16, 2)) as retention
+from tmp2 left join
+(
+    select first_login,
+           count(*)    as cnt
+    from liucun
+    group by first_login
+) as lc on tmp2.first_login = lc.first_login;
 
--- 新增数量和留存率
+
 select t3.first_login,
        t3.register,
-       t3.remain_1 / t3.register as retention
+       t3.remain_1 / t3.register as retention                    -- 新增数量和留存率
 from
 (
+    -- 每个用户首次登录时间 和 第二天是否登录 并看每天新增和留存数量
     select t1.first_login,
            count(t1.user_id) as register,
            count(t2.user_id) as remain_1
@@ -1542,13 +1528,6 @@ from
 -- 102     2021-09-22    1    0
 -- 102     2021-10-01    2    3
 -- ---------------------------------------------------------------------------------------------------------------------
--- 拿到每个用户每天的登录次数
-select user_id,
-       date_format(login_ts, 'yyyy-MM-dd') as login_date,
-       count(*)                            as login_count
-from user_login_detail
-group by user_id, date_format(login_ts, 'yyyy-MM-dd');
-
 -- 拿到每个用户每天的交易次数
 select t1.user_id,
        t1.login_date,
@@ -1556,6 +1535,7 @@ select t1.user_id,
        count(di.user_id)              as order_count
 from
 (
+    -- 拿到每个用户每天的登录次数
     select user_id,
            date_format(login_ts, 'yyyy-MM-dd') as login_date,
            count(*)                            as login_count
@@ -1617,8 +1597,7 @@ select sku_id,
        sum(if(dayofweek(create_date) = 7, sku_num, 0)) as saturday,
        sum(if(dayofweek(create_date) = 1, sku_num, 0)) as sunday
 from order_detail
-where     create_date >= '2021-09-27'
-      and create_date <= '2021-10-03'
+where create_date >= '2021-09-27' and create_date <= '2021-10-03'
 group by sku_id;
 
 
@@ -1639,23 +1618,17 @@ group by sku_id;
 -- 1     100.00
 -- 4     400.00
 -- ---------------------------------------------------------------------------------------------------------------------
--- 对每个商品按照修改日期倒序排序 并求出差值
-select sku_id,
-       new_price - lead(new_price, 1, 0) over (partition by sku_id order by change_date desc) as price_change,
-       rank() over (partition by sku_id order by change_date desc)                            as rk
-from sku_price_modify_detail;
-
--- 最近一次修改的价格
 select t1.sku_id,
        t1.price_change
 from
 (
+    -- 对每个商品按照修改日期倒序排序 并求出差值
     select sku_id,
            new_price - lead(new_price, 1, 0) over (partition by sku_id order by change_date desc) as price_change,
            rank() over (partition by sku_id order by change_date desc)                            as rk
     from sku_price_modify_detail
 ) as t1
-where rk = 1
+where rk = 1                       -- 最近一次修改的价格
 order by t1.price_change;
 
 
@@ -1688,7 +1661,7 @@ where si.name in ('xiaomi 10', 'apple 12', 'xiaomi 13');
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 同期商品售卖分析表
 -- 从订单明细表（order_detail）中，求出同一个商品在2021年和2022年中同一个月的售卖情况对比。
--- sku_id：商品ID、month：月份、2020_skusum：2020销售量、2021_skusum：2021销售量
+-- sku_id：商品ID、month：月份、2020_sku_sum：2020销售量、2021_sku_sum：2021销售量
 -- 1     9      0       11
 -- 1     10     2       38
 -- 10    10     94      205
@@ -1815,48 +1788,16 @@ from
 -- 108    1
 -- 105    1
 -- ---------------------------------------------------------------------------------------------------------------------
--- 求连续并标志是连续的第几天
-select t1.user_id,
-       t1.login_date,
-       date_sub(t1.login_date, t1.rk)                                                                 as login_date_rk,
-       count(*) over (partition by t1.user_id, date_sub(t1.login_date, t1.rk) order by t1.login_date) as counti_cn
-from
-(
-    select user_id,
-           date_format(login_ts, 'yyyy-MM-dd')                                             as login_date,
-           rank() over (partition by user_id order by date_format(login_ts, 'yyyy-MM-dd')) as rk
-    from user_login_detail
-    group by user_id, date_format(login_ts, 'yyyy-MM-dd')
-) as t1;
-
--- 求出金币数量，以及签到奖励的金币数量
-select t2.user_id,
-       max(t2.counti_cn) + sum(if(t2.counti_cn % 3 = 0, 2, 0)) + sum(if(t2.counti_cn % 7 = 0, 6, 0)) as coin_cn
-from
-(
-    select t1.user_id,
-           t1.login_date,
-           date_sub(t1.login_date, t1.rk)                                                                 as login_date_rk,
-           count(*) over (partition by t1.user_id, date_sub(t1.login_date, t1.rk) order by t1.login_date) as counti_cn
-    from
-    (
-        select user_id,
-               date_format(login_ts, 'yyyy-MM-dd')                                             as login_date,
-               rank() over (partition by user_id order by date_format(login_ts, 'yyyy-MM-dd')) as rk
-        from user_login_detail
-        group by user_id, date_format(login_ts, 'yyyy-MM-dd')
-    ) as t1
-) as t2 group by t2.user_id, t2.login_date_rk;
-
--- 求出每个用户的金币总数
 select t3.user_id,
-       sum(t3.coin_cn) as sum_coin_cn
+       sum(t3.coin_cn) as sum_coin_cn                                                  -- 求出每个用户的金币总数
 from
 (
+    -- 求出金币数量，以及签到奖励的金币数量
     select t2.user_id,
            max(t2.counti_cn) + sum(if(t2.counti_cn % 3 = 0, 2, 0)) + sum(if(t2.counti_cn % 7 = 0, 6, 0)) as coin_cn
     from
     (
+        -- 求连续并标志是连续的第几天
         select t1.user_id,
                t1.login_date,
                date_sub(t1.login_date, t1.rk)                                                                 as login_date_rk,
@@ -1893,27 +1834,8 @@ order by sum_coin_cn desc;
 -- 2    0.75    0.25    0.75    0.25    0.75    0.25
 -- 3    0.25    0.75    0.75    0.25    0.75    0.25
 -- ---------------------------------------------------------------------------------------------------------------------
--- 国庆每一天 每个商品品类有多少商品被销售了
-select t1.category_id,
-       sum(if(t1.create_date = '2021-10-01', 1, 0)) `第 1 天`,
-       sum(if(t1.create_date = '2021-10-02', 1, 0)) `第 2 天`,
-       sum(if(t1.create_date = '2021-10-03', 1, 0)) `第 3 天`,
-       sum(if(t1.create_date = '2021-10-04', 1, 0)) `第 4 天`,
-       sum(if(t1.create_date = '2021-10-05', 1, 0)) `第 5 天`,
-       sum(if(t1.create_date = '2021-10-06', 1, 0)) `第 6 天`,
-       sum(if(t1.create_date = '2021-10-07', 1, 0)) `第 7 天`
-from
-(
-    select distinct si.category_id, od.create_date, si.name
-    from order_detail as od join sku_info as si
-        on  od.sku_id      =  si.sku_id
-    where   od.create_date >= '2021-10-01'
-        and od.create_date <= '2021-10-07'
-) as t1 group by t1.category_id;
-
--- 每一天的动销率 和 滞销率
 select t2.category_id,
-       t2.`第 1 天` / t3.cn,
+       t2.`第 1 天` / t3.cn,        -- 每一天的动销率 和 滞销率
        1 - t2.`第 1 天` / t3.cn,
        t2.`第 2 天` / t3.cn,
        1 - t2.`第 2 天` / t3.cn,
@@ -1929,6 +1851,7 @@ select t2.category_id,
        1 - t2.`第 7 天` / t3.cn
 from
 (
+    -- 国庆每一天 每个商品品类有多少商品被销售了
     select t1.category_id,
            sum(if(t1.create_date = '2021-10-01', 1, 0)) as `第 1 天`,
            sum(if(t1.create_date = '2021-10-02', 1, 0)) as `第 2 天`,
@@ -1963,35 +1886,14 @@ from
 -- Cn（人数）
 -- 7
 -- ---------------------------------------------------------------------------------------------------------------------
--- 登录标记1 下线标记-1
-select login_ts as l_time,
-       1        as flag
-from user_login_detail
-union
-select logout_ts as l_time,
-       -1        as flag
-from user_login_detail;
-
--- 按照时间求和
-select sum(flag) over (order by t1.l_time) as sum_l_time
+select max(sum_l_time)      -- 拿到最大值 就是同时在线最多人数
 from
 (
-    select login_ts  as l_time,
-           1         as flag
-    from user_login_detail
-    union
-    select logout_ts as l_time,
-           -1        as flag
-    from user_login_detail
-) as t1;
-
--- 拿到最大值 就是同时在线最多人数
-select max(sum_l_time)
-from
-(
+    -- 按照时间求和
     select sum(flag) over (order by t1.l_time) as sum_l_time
     from
     (
+        -- 登录标记：1，下线标记：-1
         select login_ts  as l_time,
                1         as flag
         from user_login_detail

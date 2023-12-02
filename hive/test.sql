@@ -57,3 +57,5 @@ select movie_class, movie_code, movie_name, movie_type, stage, url from movie_tm
 
 select * from movie limit 10;
 select movie_class, count(movie_class) as count from movie where movie_class >= 0 group by movie_class order by movie_class;
+
+select cume_dist() over () from movie;
