@@ -16,10 +16,10 @@ MYSQL_PORT="3306"                                                              #
 MYSQL_USER="root"                                                              # Mysql 用户名
 MYSQL_PASSWORD="111111"                                                        # Mysql 用户密码
 MYSQL_DATABASE="test"                                                          # Mysql 数据库
-LOG_FILE="mysql-$(date +%F).log"                                               # 操作日志文件
+LOG_FILE="execute-sql-$(date +%F).log"                                         # 操作日志文件
 
 
-# 执行 SQL（$1：sql文件的路径或所在目录或 sql）
+# 执行 SQL（$1：sql 文件的路径或所在目录或 sql）
 function execute()
 {
     local file_folder file_name file_path                                      # 定义局部变量
@@ -52,7 +52,7 @@ function execute_file()
                             --user="${MYSQL_USER}"       --password="${MYSQL_PASSWORD}" \
                             --database=${MYSQL_DATABASE} < "$1"                         \
                             >> "${SERVICE_DIR}/${LOG_FILE}" 2>&1
-
+    
     echo "    ******************** $(date '+%T')：sql = $(basename "$1") 执行完成 ********************    "
 }
 
@@ -61,7 +61,7 @@ function execute_file()
 function execute_folder()
 {
     local file_list file_path                                      # 定义局部变量
-    file_list=$(ls "$1"/*.sql)                                     # 获取目录下所有的 sql 文件
+    file_list=$(find "$1" -iname "*.sql")                          # 获取目录下所有的 sql 文件
 
     # 执行 sql 文件
     for file_path in ${file_list}
@@ -74,16 +74,10 @@ function execute_folder()
 # 执行 sql（$1：执行 sql）
 function execute_sql()
 {
-    local file_path
-
-    file_path="${SERVICE_DIR}/tmp-$(date +%Y-%m-%d-%H-%M-%S).sql"
-    echo "$1"    > "${file_path}"
-
-    ${MYSQL_HOME}/bin/mysql --host="${MYSQL_HOST}"       --port="${MYSQL_PORT}"         \
-                            --user="${MYSQL_USER}"       --password="${MYSQL_PASSWORD}" \
-                            --database=${MYSQL_DATABASE} < "${file_path}"               \
-                            2> "${SERVICE_DIR}/${LOG_FILE}"
-    rm -rf "${file_path}"
+    ${MYSQL_HOME}/bin/mysql --host="${MYSQL_HOST}"        --port="${MYSQL_PORT}"         \
+                            --user="${MYSQL_USER}"        --password="${MYSQL_PASSWORD}" \
+                            --database=${MYSQL_DATABASE}  --execute "$1"                 \
+                            2>> "${SERVICE_DIR}/${LOG_FILE}"
 }
 
 
@@ -99,3 +93,4 @@ done
 
 printf "================================================================================\n\n"
 exit 0
+
